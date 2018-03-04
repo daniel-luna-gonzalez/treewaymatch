@@ -1,0 +1,8 @@
+div.output-detail{
+    height: 400px;
+    width: 100%;
+}
+textarea.output-detail{
+    height: 100%;
+    width: 100%;
+}

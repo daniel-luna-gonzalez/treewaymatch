@@ -18,3 +18,5 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'StatementBalanceController@index')->name('home');
+Route::match(["get", "post"],'/saprequest', 'StatementBalanceController@saprequest');
+
