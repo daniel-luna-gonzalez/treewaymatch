@@ -1,14 +1,12 @@
-$(document).ready(function(){
-    var statementBalance = new StatementBalance();
-    statementBalance.init();
-});
+
 
 var StatementBalance = function(){
-    this.init = function(){
+    this.init = function(CSDOCS_WS_HOST,  CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE){
+        console.log(CSDOCS_WS_HOST);
         $('#uploadButton').on("click", function(e){
-            e.preventDefault();
-            uploadDocuments();
+            uploadDocuments(e, CSDOCS_WS_HOST,  CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE);
         });
+
         $('#saprequestbutton').on("click", function(){
             showSapRequest();
         });
@@ -28,8 +26,9 @@ var StatementBalance = function(){
                     action: function(dialog){
                         var tr = $('#saptable tbody').find('.selected').first();
                         var selected = tr.find("td");
-                        var number = $(selected[1]).text();
-                        $('#saprequest').val(number);
+                        var number = $(selected[0]).text();
+                        var amount = $(selected[1]).text();
+                        setSaprequestValue(number, amount);
                         dialog.close();
                 }
             }, {
@@ -62,6 +61,11 @@ var StatementBalance = function(){
         });
     }
 
+    var setSaprequestValue = function(number, amount){
+        $('#numero_sap').val(number);
+        $('#saprequestamount').val(amount);
+    }
+
     var getTable = function(){
         var tbody = $("<tbody>");
         var table = $('<table>', {"id": "saptable", class: "display"}).append(
@@ -89,7 +93,7 @@ var StatementBalance = function(){
         {"number": 5577322, "amount": 7120.08},
     ];
 
-    var uploadDocuments = function(){
+    var uploadDocuments = function(ev, CSDOCS_WS_HOST,  CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE){
         var status = true;
         if(document.getElementById("pdf").files.length == 0) {
             $('#pdf').closest('.input-group').first().addClass("has-error");
@@ -105,14 +109,79 @@ var StatementBalance = function(){
         else
             $('#cfdi').closest('.input-group').first().removeClass("has-error");
 
-        if($('#saprequest').val().length == 0) {
+        if($('#numero_sap').val().length == 0) {
             status = false;
-            $('#saprequest').closest('.input-group').first().addClass("has-error");
+            $('#numero_sap').closest('.input-group').first().addClass("has-error");
         }
         else
-            $('#saprequest').closest('.input-group').first().removeClass("has-error");
+            $('#numero_sap').closest('.input-group').first().removeClass("has-error");
 
-        if(status)
-            $('#saprequestform').submit();
+        console.log(status);
+
+        if(!status){
+            ev.preventDefault();
+            return;
+        }
+
+        console.log($("#saprequestform"));
+
+        $("#saprequestform").submit(function(e) {
+            console.log("submitting");
+
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            console.log(formData);
+
+            $.ajax({
+                url: "api/saprequest",
+                method: 'POST',
+                sync: false,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                datatype: "json",
+                success: function (data) {
+                    console.log(data);
+                    if(data.status){
+                        var base64 = data.base64;
+                        storeincsdocs(CSDOCS_WS_HOST, base64, CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE);
+                    } else{
+                        log(data.message);
+                    }
+
+                },
+                error: function(data){
+                    console.log(data);
+                },
+            });
+        });
     }
+
+    var storeincsdocs = function(CSDOCS_WS_HOST, base64, CSDOCS_WS_IDDIRECTORY, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE){
+        var data = {idDirectory: CSDOCS_WS_IDDIRECTORY, idRepository: CSDOCS_WS_IDREPOSITORY, idInstance: CSDOCS_WS_IDINSTANCE, metadata: $('#numero_sap').val(), file64: base64}
+
+        console.log(data);
+
+        $.ajax({
+            url: CSDOCS_WS_HOST+"/api/document/store",
+            method: 'POST',
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+            },
+
+        });
+    }
+
+    var log = function(message){
+        $('#output-detail').append(message);
+    }
+
 };

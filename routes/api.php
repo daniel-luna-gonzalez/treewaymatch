@@ -16,3 +16,9 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::match(["post"],'/test', function(){
+    return response()->json(["status" => true, "message" => "active service"]);
+});
+
+Route::match(["post", "get"],'/saprequest', 'StatementBalanceController@saprequest');

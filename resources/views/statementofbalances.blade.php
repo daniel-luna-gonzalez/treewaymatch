@@ -10,11 +10,14 @@
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
         {{ Form::open(array("method" => "post",'url' => 'saprequest', 'files' => true, "id" => "saprequestform")) }}
             <div class="input-group">
-                <input type="text" id="saprequest" name="saprequest" class="form-control" readonly="true">
+                <input type="text" id="numero_sap" name="numero_sap" class="form-control" readonly="true">
                 <span class="input-group-btn">
                 <button class="btn btn-primary" type="button" id="saprequestbutton">Pedido SAP</button>
               </span>
             </div>
+        <div class="input-group">
+            <input type="hidden" id="saprequestamount" name="saprequestamount" class="form-control" readonly="true">
+        </div>
             <div class="input-group">
                 <label>CFDI</label>
                 <input type="file" id="cfdi" name="cfdi" class="form-control" accept="text/xml">
@@ -40,4 +43,10 @@
 <script type="text/javascript" src="libraries/bootstrap3-dialog/src/js/bootstrap-dialog.js"></script>
 <script src="{{ asset('js/statementofbalance.js') }}"></script>
 
+    <script>
+        $(document).ready(function(){
+            var statementBalance = new StatementBalance();
+            statementBalance.init("{{env("CSDOCS_WS_HOST")}}");
+        });
+    </script>
 @endsection
