@@ -31,12 +31,18 @@
             <input type="submit" id="uploadButton" class="btn btn-primary" value="Cargar">
         </div>
     {{Form::close()}}
+        <br>
+        <br>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+            <input type="button" class="btn btn-primary" onclick="window.location='{{ url("/report/") }}'" value="Reporte">
+        </div>
 </div>
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
     <div class="output-detail">
         <textarea class="output-detail" id="output-detail" readonly></textarea>
     </div>
 </div>
+
 @endsection
 @section("js")
 <script type="text/javascript" src="libraries/DataTables/datatables.js"></script>

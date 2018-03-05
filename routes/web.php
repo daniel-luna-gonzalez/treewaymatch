@@ -18,5 +18,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'StatementBalanceController@index')->name('home');
+Route::get('/report', 'StatementBalanceController@report');
 
 

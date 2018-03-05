@@ -18,7 +18,7 @@
 <body>
     <div id="app">
         <div>
-            <img src="{{asset("/images/grupoecologo.png")}}" class="app-logo-top">
+            <img src="{{asset("/images/grupoecologo.png")}}" class="app-logo-top" onclick="window.location='{{ url("/home/") }}'" style="cursor: pointer;">
         </div>
         <nav class="navbar navbar-inverse navbar-static-top">
             <div class="container">
