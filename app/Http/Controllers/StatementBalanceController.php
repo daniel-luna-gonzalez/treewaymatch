@@ -21,10 +21,14 @@ class StatementBalanceController extends Controller
 
             $xml = simplexml_load_file($cfdi->getRealPath());
 
-            if((float)$xml["total"] < (float) $sapamount)
-                return response()->json(["status" => true]);
+            $diff = (float) $sapamount - (float)$xml["total"];
 
-            return response()->json(["status" => true, "base64" => base64_encode(file_get_contents($pdf->getRealPath()))]);
+            if($diff > 0)
+                return response()->json(["status" => false, "diff" => $diff]);
+
+            $diff = -1*(float)$diff;
+
+            return response()->json(["status" => true, "diff" => $diff, "base64" => base64_encode(file_get_contents($pdf->getRealPath()))]);
         }catch(\Exception $e){
             return response()->json(["status" => false, "message" => "Ocurrió un error durante la operación"]);
         }

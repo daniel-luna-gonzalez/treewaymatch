@@ -46,7 +46,7 @@
     <script>
         $(document).ready(function(){
             var statementBalance = new StatementBalance();
-            statementBalance.init("{{env("CSDOCS_WS_HOST")}}");
+            statementBalance.init("{{env("CSDOCS_WS_HOST")}}", "{{env("CSDOCS_WS_IDDIRECTORY")}}", "{{env("CSDOCS_WS_IDREPOSITORY")}}", "{{env("CSDOCS_WS_IDINSTANCE")}}");
         });
     </script>
 @endsection

@@ -2,13 +2,32 @@
 
 var StatementBalance = function(){
     this.init = function(CSDOCS_WS_HOST,  CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE){
-        console.log(CSDOCS_WS_HOST);
+        console.log("init");
+        log("Iniciando Servicios...", 3000);
+        console.log("...");
+        log("Conectividad lista con CSDocs...", 3000);
+        console.log("...");
+
         $('#uploadButton').on("click", function(e){
             uploadDocuments(e, CSDOCS_WS_HOST,  CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE);
         });
 
         $('#saprequestbutton').on("click", function(){
             showSapRequest();
+        });
+
+        $.ajax({
+            url: CSDOCS_WS_HOST+"/api/document/store",
+            method: 'POST',
+            data: {idDocument: 1, idInstance: 1},
+            cache: false,
+            // contentType: "application/json; charset=utf-8",
+            datatype: "json",
+            // type: "json",
+            success: function (data) {
+                console.log(data);
+            },
+
         });
     }
 
@@ -134,6 +153,12 @@ var StatementBalance = function(){
 
             console.log(formData);
 
+            log("Validando al SAT", 3000);
+            log("Documento Acuse Recibido", 3000);
+            log("Cotejo Pedido");
+            log("Validando Pedido");
+            log("Validando Entrada Almacen");
+
             $.ajax({
                 url: "api/saprequest",
                 method: 'POST',
@@ -147,9 +172,11 @@ var StatementBalance = function(){
                     console.log(data);
                     if(data.status){
                         var base64 = data.base64;
+                        log("SAP registro...");
+                        log("Diferencia:"+data.diff);
                         storeincsdocs(CSDOCS_WS_HOST, base64, CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE);
                     } else{
-                        log(data.message);
+                        log("No aceptado, el monto es menor al pedido SAP: "+data.diff);
                     }
 
                 },
@@ -161,7 +188,7 @@ var StatementBalance = function(){
     }
 
     var storeincsdocs = function(CSDOCS_WS_HOST, base64, CSDOCS_WS_IDDIRECTORY, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE){
-        var data = {idDirectory: CSDOCS_WS_IDDIRECTORY, idRepository: CSDOCS_WS_IDREPOSITORY, idInstance: CSDOCS_WS_IDINSTANCE, metadata: $('#numero_sap').val(), file64: base64}
+        var data = {idDirectory: CSDOCS_WS_IDDIRECTORY, idRepository: CSDOCS_WS_IDREPOSITORY, idInstance: CSDOCS_WS_IDINSTANCE, metadata: {"numero_sap": $('#numero_sap').val()}, file64: base64, fileName: "numero_sap.pdf"}
 
         console.log(data);
 
@@ -170,18 +197,36 @@ var StatementBalance = function(){
             method: 'POST',
             data: data,
             cache: false,
-            contentType: false,
-            processData: false,
-            datatype: "json",
+            // contentType: "application/json; charset=utf-8",
+            // datatype: "json",
+             type: "json",
             success: function (data) {
-                console.log(data);
+                if(data.status){
+                    log("SAP registro ");
+                    log("Aceptado y registrado en SAP");
+                    log("Almacenado en CSDocs");
+                }else{
+                    log("No fue posible ingresar documento a CSDocs");
+                }
             },
 
         });
     }
 
-    var log = function(message){
-        $('#output-detail').append(message);
+    var log = function(message, milliseconds){
+        if(milliseconds > 0)
+            sleep(milliseconds);
+
+        $('#output-detail').append(message+" \n");
+    }
+
+    function sleep(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds){
+                break;
+            }
+        }
     }
 
 };
