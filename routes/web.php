@@ -19,5 +19,6 @@ Auth::routes();
 
 Route::get('/home', 'StatementBalanceController@index')->name('home');
 Route::get('/report', 'StatementBalanceController@report');
+Route::get('/email', 'StatementBalanceController@email');
 
 

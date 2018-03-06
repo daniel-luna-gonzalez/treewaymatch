@@ -176,7 +176,7 @@ var StatementBalance = function(){
                         log("Diferencia:"+data.diff);
                         storeincsdocs(CSDOCS_WS_HOST, base64, CSDOCS_WS_IDDOCUMENT, CSDOCS_WS_IDREPOSITORY, CSDOCS_WS_IDINSTANCE);
                     } else{
-                        log("No aceptado, el monto es menor al pedido SAP: "+data.diff);
+                        log("Monto menor al pedido SAP, diferencia: "+data.diff);
                     }
 
                 },
